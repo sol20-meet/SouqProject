@@ -19,17 +19,30 @@ config = {
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 
 @app.route('/')
 def home():
-	return render_template('index.html')
+	places_list = []
+	places = db.child("places").get()
+	if places is not None:
+		for place in places.each():
+			places_list.append(place.val())
+		random.shuffle(places_list)
+
+	return render_template('index.html', places = places_list)
 
 
 @app.route('/about.html')
 def About():
 	return render_template('about.html')
+
+@app.route('/list.html')
+def List():
+	return render_template('list.html')
+
 
 
 @app.route('/upload.html' , methods=['GET','POST'])
