@@ -43,11 +43,26 @@ def About():
 def List():
 	return render_template('list.html')
 
+@app.route('/admin' , methods=['GET','POST'])
+def Login():
+	if request.method == 'GET':
+		return render_template('login.html')
+	else:
+		password = request.form['password']
+		DBpassword = db.child("admin").child("adminPass").get().val()
+		if password == DBpassword:
+			print('Success')
+			return render_template('upload.html', token = password)
+		else:
+			return redirect('/admin')
+
+
 
 
 @app.route('/upload.html' , methods=['GET','POST'])
 def upload():
 	if request.method == 'GET' :
+
 		return render_template('upload.html')
 	else:
 		# print("creating Place object")
@@ -67,8 +82,8 @@ def upload():
 
 @app.route('/place.html/<int:p_id>')
 def place(p_id):
-	return render_template('place.html')
-
+	place = db.child("places").child(p_id).get()
+	return render_template('place.html', place = place)
 
 
 if __name__ == '__main__':
